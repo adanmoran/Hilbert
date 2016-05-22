@@ -8,7 +8,7 @@ package fourier;
  * @since 13-05-2016
  *
  */
-public class Complex 
+public class Complex
 {
 	private final double real, imaginary;
 	
@@ -37,6 +37,7 @@ public class Complex
 	{
 		if(imaginary < 0)
 			return Double.toString(real) + " - " + Double.toString(-imaginary) + "i";
+		
 		return Double.toString(real) + " + " + Double.toString(imaginary) + "i";
 			
 	}
@@ -82,7 +83,7 @@ public class Complex
 	 * Get the absolute value - or magnitude - of the complex number
 	 * @return norm{this}
 	 */
-	public double abs()
+	public double magnitude()
 	{
 		return Math.hypot(real, imaginary);
 	}
@@ -112,7 +113,7 @@ public class Complex
 	public Complex reciprocal()
 	{
 		if(real == 0 && imaginary == 0)
-			return this;
+			return new Complex(real,imaginary);
 		double scale = real*real + imaginary*imaginary;
 		return new Complex(real / scale, imaginary / scale);
 	}
@@ -250,5 +251,20 @@ public class Complex
 	{
 		return sin().divide(cos());
 	}
-
+	
+	public Complex clone()
+	{
+		return new Complex(this.real,this.imaginary);
+	}
+	
+	public boolean equals(Object o)
+	{
+		if(o instanceof Complex)
+		{
+			Complex c = (Complex) o;
+			if(c.getReal() == real && c.getImaginary() == imaginary)
+				return true;
+		}
+		return false;
+	}
 }
