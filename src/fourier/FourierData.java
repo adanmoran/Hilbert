@@ -5,67 +5,93 @@ import java.util.ArrayList;
 public class FourierData 
 {
 	//Data for the fourier transform
+	//TODO: change this to a HashMap instead of double arrayLists
 	private ArrayList<Double> frequencies;
 	private ArrayList<Complex> values;
-	/* maxFrequency is the value that gives the frequency range:
-	 * normally, a Fourier transform has frequencies between 0 and 1 in steps of 1/(size(data)),
-	 * but this will allow us to represent it as frequencies between -F and F.
-	 */
-	private double maxFrequency, minFrequency;
+	private int size;
 	
-	public FourierData() throws FourierException
+	public FourierData()
 	{
-		
+		frequencies = new ArrayList<>();
+		values = new ArrayList<>();
 	}
 	
 	public FourierData(ArrayList<Double> frequencies, ArrayList<Complex> values) throws FourierException
 	{
+		if(frequencies.size() != values.size())
+			throw new FourierException("Frequencies and Compex-value vectors must have the same dimensions.");
 		
+		//Initialize the arrays
+		frequencies = new ArrayList<>();
+		values = new ArrayList<>();
+		size = 0;
+		
+		//Add the elements from the given array, so that we are not cloning the elements.
+		for(int i = 0; i < frequencies.size(); i++)
+		{
+			add(frequencies.get(i), values.get(i).clone());
+		}
 	}
 	
-	public FourierData(ArrayList<Double> frequencies, ArrayList<Complex> values, double maxFrequency) throws FourierException
+	public ArrayList<Double> getFrequencies()
 	{
-		
+		ArrayList<Double> freqs = new ArrayList<Double>(frequencies.size());
+		for(double d : frequencies)
+			freqs.add(d);
+		return freqs;
 	}
 	
-	public FourierData(ArrayList<Double> frequencies, ArrayList<Complex> values, double maxFrequency, double minFrequency) throws FourierException
+	public ArrayList<Complex> getValues()
 	{
-		
-		//TODO: instantiate all the variables
-		this.maxFrequency = maxFrequency;
-		this.minFrequency = minFrequency;
-		// Check if the frequencies list is a power of two and extend it with zeros if it is not.
-		
-		//If it is, instantiate the frequencies list and add all the elements
-		this.frequencies = new ArrayList<Double>();
-		for(Double freq : frequencies)
-			addFrequency(freq);
-		// Check to see if the values list is the same size as the frequency list
-		
-		// Instantiate the values list
-		this.values = new ArrayList<Complex>();
-		for(Complex val : values)
-			addValue(val);
-		//TODO: check for consistency in the given variables (frequencies[] and values[] should be of size power of 2...
-		//    max/minFrequency should be realistic given the knowledge of Fourier transforms, etc.
+		ArrayList<Complex> vals = new ArrayList<>(values.size());
+		for(Complex c : values)
+			vals.add(c.clone());
+		return vals;
 	}
 	
-	private void addFrequency(double frequency) throws FourierException
+	private void addFrequency(double frequency)
 	{
-		//TODO: check that the given frequency is in the correct range and add it to the list
-		if(frequency > maxFrequency || frequency < minFrequency)
-			throw new FourierException("Input frequency out of range.");
-		//TODO: add it to the list
+		frequencies.add(frequency);
 	}
 	
-	private void addValue(Complex value)
+	private void addValue(Complex value) throws FourierException
 	{
+		if(value == null)
+			throw new FourierException("Complex values added to Fourier Array cannot be null.");
 		values.add(value);
 	}
 	
-	private void addData(double frequency, Complex value) throws FourierException
+	public void add(double frequency, Complex value) throws FourierException
 	{
 		addFrequency(frequency);
 		addValue(value);
+		size++;
+	}
+	
+	public int size()
+	{
+		return size;
+	}
+	
+	public boolean equals(Object o)
+	{
+		if(o instanceof FourierData)
+		{
+			FourierData d = (FourierData) o;
+			ArrayList<Double> freqs = d.getFrequencies();
+			ArrayList<Complex> vals = d.getValues();
+			if(size() != d.size())
+				return false;
+			else
+			{
+				for(int i = 0; i < frequencies.size(); i++)
+				{
+					if(freqs.get(i) != frequencies.get(i) || !vals.get(i).equals(values.get(i)))
+						return false;
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 }

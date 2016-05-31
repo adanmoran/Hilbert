@@ -2,6 +2,8 @@ package testing;
 
 import static org.junit.Assert.*;
 
+import java.util.regex.Matcher;
+
 import org.hamcrest.CoreMatchers;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -95,33 +97,160 @@ public class ComplexTest {
 	}
 
 	@Test
-	public void testAbs() {
-		fail("Not yet implemented");
+	public void testMagnitude() 
+	{
+		Complex complex;
+		for(int i = 0; i < 10000; i+= 100)
+		{
+			double real = Math.random();
+			int realNeg = real > 0.5 ? 1 : -1;
+			real = real * i * realNeg;
+			double imaginary = Math.random();
+			int imNeg = imaginary > 0.5 ? 1 : -1;
+			imaginary = imaginary * i * imNeg;
+			complex = new Complex(real,imaginary);
+			
+			assertThat(Math.hypot(real, imaginary), is(complex.magnitude()));
+		}
 	}
 
 	@Test
 	public void testPhase() {
-		fail("Not yet implemented");
+		Complex complex;
+		for(int i = 0; i < 10000; i+= 100)
+		{
+			double real = Math.random();
+			int realNeg = real > 0.5 ? 1 : -1;
+			real = real * i * realNeg;
+			double imaginary = Math.random();
+			int imNeg = imaginary > 0.5 ? 1 : -1;
+			imaginary = imaginary * i * imNeg;
+			complex = new Complex(real,imaginary);
+			
+			assertThat(Math.atan2(imaginary,real), is(complex.phase()));
+		}
 	}
 
 	@Test
 	public void testConjugate() {
-		fail("Not yet implemented");
+		Complex complex;
+		for(int i = 0; i < 10000; i+= 100)
+		{
+			double real = Math.random();
+			int realNeg = real > 0.5 ? 1 : -1;
+			real = real * i * realNeg;
+			double imaginary = Math.random();
+			int imNeg = imaginary > 0.5 ? 1 : -1;
+			imaginary = imaginary * i * imNeg;
+			complex = new Complex(real,imaginary);
+			
+			assertTrue(new Complex(real, -imaginary).equals(complex.conjugate()));
+		}
 	}
 
 	@Test
-	public void testReciprocal() {
+	public void testReciprocal() 
+	{
 		fail("Not yet implemented");
 	}
 
 	@Test
 	public void testPlus() {
-		fail("Not yet implemented");
+		assertTrue(new Complex(0,0).plus(new Complex(0,1)).equals(new Complex(0,1)));
+		//Testing positive numbers
+		assertTrue(new Complex(10,10).plus(new Complex(2,7)).equals(new Complex(12,17)));
+		assertTrue(new Complex(0,0).plus(new Complex(1,0)).equals(new Complex(1,0)));
+		for(int i = 0; i < 10000; i++)
+		{
+			double real1 = Math.random() * i;
+			double real2 = Math.random() * i;
+			double im1 = Math.random() * i;
+			double im2 = Math.random() * i;
+			
+			assertTrue(new Complex(real1,im1).plus(new Complex(real2,im2)).equals(new Complex(real1 + real2, im1 + im2)));
+		}
+		assertTrue(new Complex(-10,-10).plus(new Complex(-2,-7)).equals(new Complex(-12,-17)));
+		assertTrue(new Complex(-1,0).plus(new Complex(0,-1)).equals(new Complex(-1,-1)));
+		//Testing negative numbers
+		for(int i = 0; i < 10000; i++)
+		{
+			double real1 = Math.random() * -i;
+			double real2 = Math.random() * -i;
+			double im1 = Math.random() * -i;
+			double im2 = Math.random() * -i;
+			
+			assertTrue(new Complex(real1,im1).plus(new Complex(real2,im2)).equals(new Complex(real1 + real2, im1 + im2)));
+		}
+		//Testing both
+		assertTrue(new Complex(-1,0).plus(new Complex(2,-4)).equals(new Complex(1,-4)));
+		assertTrue(new Complex(14.3,-12.3).plus(new Complex(-20,2.3)).equals(new Complex(14.3 - 20,-12.3 + 2.3)));
+		for(int i = 0; i < 10000; i++)
+		{
+			double real1 = Math.random() * i;
+			double real2 = Math.random() * i * (real1 > 0.5*i ? 1 : -1);
+			real1 = real1 * (Math.abs(real2) > 0.5*i ? 1 : -1);
+			double im1 = Math.random() * i;
+			double im2 = Math.random() * i * (im1 > 0.5*i ? 1 : -1);
+			im1 = im1 * (Math.abs(im2) > 0.5*i ? 1 : -1);
+			
+			assertTrue(new Complex(real1,im1).plus(new Complex(real2,im2)).equals(new Complex(real1 + real2, im1 + im2)));
+		}
 	}
 
 	@Test
 	public void testMinus() {
-		fail("Not yet implemented");
+		assertTrue(new Complex(0,1).minus(new Complex(0,0)).equals(new Complex(0,1)));
+		//Testing positive numbers
+		assertTrue(new Complex(10,10).minus(new Complex(2,7)).equals(new Complex(8,3)));
+		assertTrue(new Complex(0,0).minus(new Complex(1,0)).equals(new Complex(-1,0)));
+		for(int i = 0; i < 10000; i++)
+		{
+			double real1 = Math.random() * i;
+			double real2 = Math.random() * i;
+			double im1 = Math.random() * i;
+			double im2 = Math.random() * i;
+			
+			assertTrue(new Complex(real1,im1).minus(new Complex(real2,im2)).equals(new Complex(real1 - real2, im1 - im2)));
+		}
+		assertTrue(new Complex(-10,-10).minus(new Complex(-2,-7)).equals(new Complex(-8,-3)));
+		assertTrue(new Complex(-1,0).minus(new Complex(0,-1)).equals(new Complex(-1,1)));
+		//Testing negative numbers
+		for(int i = 0; i < 10000; i++)
+		{
+			double real1 = Math.random() * -i;
+			double real2 = Math.random() * -i;
+			double im1 = Math.random() * -i;
+			double im2 = Math.random() * -i;
+			
+			assertTrue(new Complex(real1,im1).minus(new Complex(real2,im2)).equals(new Complex(real1 - real2, im1 - im2)));
+		}
+		//Testing both
+		assertTrue(new Complex(-1,0).minus(new Complex(2,-4)).equals(new Complex(-3,4)));
+		assertTrue(new Complex(14.3,-12.3).minus(new Complex(-20,2.3)).equals(new Complex(14.3 - -20,-12.3 - 2.3)));
+		for(int i = 0; i < 10000; i++)
+		{
+			double real1 = Math.random() * i;
+			double real2 = Math.random() * i * (real1 > 0.5*i ? 1 : -1);
+			real1 = real1 * (Math.abs(real2) > 0.5*i ? 1 : -1);
+			double im1 = Math.random() * i;
+			double im2 = Math.random() * i * (im1 > 0.5*i ? 1 : -1);
+			im1 = im1 * (Math.abs(im2) > 0.5*i ? 1 : -1);
+			
+			assertTrue(new Complex(real1,im1).minus(new Complex(real2,im2)).equals(new Complex(real1 - real2, im1 - im2)));
+		}
+		//Show that minus() == -plus()
+		for(int i = 0; i < 10000; i++)
+		{
+			double real1 = Math.random() * i;
+			double real2 = Math.random() * i * (real1 > 0.5*i ? 1 : -1);
+			real1 = real1 * (Math.abs(real2) > 0.5*i ? 1 : -1);
+			double im1 = Math.random() * i;
+			double im2 = Math.random() * i * (im1 > 0.5*i ? 1 : -1);
+			im1 = im1 * (Math.abs(im2) > 0.5*i ? 1 : -1);
+			
+			assertTrue(new Complex(real1,im1).minus(new Complex(real2,im2)).equals(
+					new Complex(real1,im1).plus(new Complex(-real2, -im2))));
+		}
 	}
 
 	@Test

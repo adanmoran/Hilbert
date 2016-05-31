@@ -94,7 +94,7 @@ public class Complex
 	 */
 	public double phase()
 	{
-		return Math.atan2(real, imaginary);
+		return Math.atan2(imaginary,real);
 	}
 	
 	/**
