@@ -7,39 +7,36 @@ public class FourierTransform
 	public static FourierData ddft(TimeData tData) throws FourierException
 	{
 		// Get the time data so we can use it to compute the fourier data
-		ArrayList<Double> time = tData.getTimes();
-		ArrayList<Double> tVals = tData.getValues();
+		Double[] time = tData.getTimes();
+		Double[] tVals = tData.getValues();
 		
 		// Get the next power of 2
-		int N = time.size();
+		int N = time.length;
 		if(N == 0)
 			throw new FourierException("Cannot transform empty arrays.");
 
 		int nextPow2 = (N % 2 != 0) ? (32 - Integer.numberOfLeadingZeros(N - 1)) : N;
 		
 		// Create arrayLists of the correct size (powers of 2) to contain the FourierData elements
-		ArrayList<Double> frequencies = new ArrayList<>(nextPow2);
-		ArrayList<Complex> values = new ArrayList<>(nextPow2);
+		Double[] frequencies = new Double[nextPow2];
+		Complex[] values = new Complex[nextPow2];
 		
-		//TODO: Calculate the frequencies using the time array and set frequencies to this frequency data
+		//Calculate the frequencies using the time array and set frequencies to this frequency data
 		double samplingFrequency = tData.getSamplingFrequency();
 		for(int k = 0; k < N; k++)
-			frequencies.add(samplingFrequency * k / N);
+			frequencies[k] = (samplingFrequency * k / N);
 		//We initialize an array because the fft function (from Princeton) uses Complex[] as an input.
-		Complex[] complexValues = new Complex[values.size()];
-		for(int i = 0; i < values.size(); i++)
+		
+		for(int i = 0; i < N; i++)
 		{
-			if(i < tVals.size())
-				complexValues[i] = new Complex(tVals.get(i),0);
+			if(i < tVals.length)
+				values[i] = new Complex(tVals[i],0);
 			else
-				complexValues[i] = new Complex(0,0);
+				values[i] = new Complex(0,0);
 		}
 			
 		// Compute the fourier transform using Princeton's FFT function
-		Complex[] fouriered = fft(complexValues);
-		// Set the computed Fourier Transform values in the ArrayList
-		for(Complex c : fouriered)
-			values.add(c);
+		values = fft(values);
 		
 		// Set the FourierData with the above frequency and Complex-valued data
 		FourierData returnableData = new FourierData(frequencies, values);
