@@ -3,7 +3,7 @@ package fourier;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class TimeData 
+public class TimeData
 {
 	//TODO: change this to a HashMap
 	private final LinkedHashMap<Double, Double> data;
@@ -59,20 +59,21 @@ public class TimeData
 	 */
 	public void add(double time, double value) throws DataException
 	{
+		if(period == 0)
+			throw new DataException("Period must be set before adding elements to TimeData objects.");
 		Double[] times = getTimes();
 		if(!data.isEmpty() && time < times[times.length - 1])
 			throw new DataException("Time added to TimeData must be sequential.");
 		
-		if(data.size() >= 2)
+		if(data.size() >= 1)
 		{
 			double potentialPeriod = time - times[times.length - 1];
 
 			if(potentialPeriod < 0)
 				throw new DataException("Added time must be greater than previous time data.");
-			else if(period == 0)
-				throw new DataException("Period must be set before adding elements to TimeData objects.");
 			else if(Math.abs(period - potentialPeriod) > tolerance)
-				throw new DataException("Elements added to TimeData must be given at regular intervals.");
+				throw new DataException("Elements added to TimeData must be at a distance of (period +- " +
+														tolerance + ") from the previously added element.");
 		}
 		data.put(time, value);
 	}
@@ -127,8 +128,13 @@ public class TimeData
 	 */
 	public void addCollection(Double[] times, Double[] values) throws DataException
 	{
+		if(times == null || values == null)
+			throw new DataException("Cannot add null collection to TimeData object.");
 		if(times.length != values.length)
 			throw new DataException("Time and Value vector dimensions do not agree.");
+		else if(times.length == 0)
+			return;
+		
 		for(int i = 0; i < times.length; i++)
 			add(times[i], values[i]);
 	}
@@ -174,5 +180,38 @@ public class TimeData
 	public void clear()
 	{
 		data.clear();
+	}
+	
+	/**
+	 * Compare equality to another TimeData object based on the underlying HashMap
+	 * @param o Object to compare equality
+	 * @return boolean representing whether the underlying HashMaps are equal
+	 */
+	public boolean equals(Object o)
+	{
+		if(o instanceof TimeData)
+		{
+			TimeData t = (TimeData) o;
+			if((t.period == this.period) && (t.data.equals(data)))
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Clone this TimeData object into another TimeData object
+	 * @return a TimeData object with the same values
+	 */
+	public TimeData clone()
+	{
+		TimeData returnable = null;
+		try
+		{
+			returnable = new TimeData(this.period);
+			returnable.addCollection(getTimes(), getValues());
+		}
+		catch(DataException e)
+		{}
+		return returnable;
 	}
 }
